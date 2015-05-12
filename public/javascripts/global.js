@@ -46,6 +46,7 @@ function cmdWithArgs(value){
       data: { "cmdline": input },
       success: function(response){ 
         $('#textArea').text(response);
+        $('#textbox_cmdline_id').val("");
       },
   });
 }

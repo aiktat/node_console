@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var exec = require('child_process').exec;
-var url = require('url');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 
 module.exports = router;
 
@@ -32,20 +33,22 @@ router.get('/*', function(req, res){
   });  
 });
 
-function server_execWithArgs(cmd, callback){
-  var child;
-  child =  exec(cmd, {timeout: 1000}, function(error, stdout, stderr){
-      callback(stdout + stderr);
-      if(error!== null)
-        console.log('exec error:' + error);          
-    });
-}
+eventEmitter.on('server_exec completed', function(cmd){
+  var timestamp = new Date();
+  console.log(timestamp.getTime() + ":" + cmd);
+});
+
 
 // child process: exec
 function server_exec(cmd, callback) {
   var child;
-  child = exec(cmd, {timeout: 1000}, function(error, stdout, stderr){
+
+  var timestamp = new Date();
+  console.log(timestamp.getTime() + ":" + "server_exec");
+  
+  child = exec(cmd, {timeout: 2000}, function(error, stdout, stderr){
     callback(stdout + stderr);
+    eventEmitter.emit('server_exec completed', cmd);
     if(error !== null){ 
       console.log('exec error:' + error);
     }
@@ -59,4 +62,5 @@ function server_getCmd(data) {
   var cmd = args_array[0].replace('/', '');
   return cmd;
 }
+
 
