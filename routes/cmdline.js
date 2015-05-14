@@ -4,13 +4,20 @@ var exec = require('child_process').exec;
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 
+/*
+var http = require('http');
+var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+io.emit('welcome', "xxx");
+*/
+
 module.exports = router;
 
 var textContent="something";
 
 router.get('/', function(req, res) {
   res.render('cmdline', { title: 'cmdline' });
- 
 });
 
 router.get('/sample', function(req, res){
@@ -25,17 +32,23 @@ router.get('/spawn', function(req, res){
   });
 });
 
+/*
 router.get('/*', function(req, res){
   var cmd = server_getCmd(req.url);
 
   server_exec(cmd, function(return_value){
     res.end(return_value);
-  });  
+  });
 });
+*/
 
-eventEmitter.on('server_exec completed', function(cmd){
+eventEmitter.on('timestamp', function(cmd){
   var timestamp = new Date();
-  console.log(timestamp.getTime() + ":" + cmd);
+  console.log(
+      String(timestamp.getMinutes()) + ":" +
+      String(timestamp.getSeconds()) +"."+
+      String(timestamp.getMilliseconds()) + "==" +
+      cmd);
 });
 
 
@@ -44,16 +57,15 @@ function server_exec(cmd, callback) {
   var child;
 
   var timestamp = new Date();
-  console.log(timestamp.getTime() + ":" + "server_exec");
-  
+
   child = exec(cmd, {timeout: 2000}, function(error, stdout, stderr){
     callback(stdout + stderr);
-    eventEmitter.emit('server_exec completed', cmd);
-    if(error !== null){ 
+    eventEmitter.emit('timestamp', cmd);
+    if(error !== null){
       console.log('exec error:' + error);
     }
   });
-} 
+}
 
 // extract cmd from string
 function server_getCmd(data) {

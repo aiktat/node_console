@@ -1,7 +1,7 @@
 
 var textContent = "";
 // DOM Ready =============================================================
-$(document).ready(function() {        // jquery .ready(handler) 
+$(document).ready(function() {        // jquery .ready(handler)
 //$(function(){                         // jquery .ready(handler) equivalent syntax
 //jQuery(document).ready(function ($) {   // jquery aliasing jQuery Namespace (when $ shortcut is no longer available)
 
@@ -10,10 +10,9 @@ $(document).ready(function() {        // jquery .ready(handler)
     if(value){
       cmdWithArgs(value);
     }
-  }); 
+  });
 
   $("#textbox_cmdline_id").keypress(function(e) {
-    //alert("handler for .keypress() called.");
     if(e.which == 13) {
       var value = $("#textbox_cmdline_id").val();
       if(value) {
@@ -21,12 +20,21 @@ $(document).ready(function() {        // jquery .ready(handler)
       }
     }
   });
+
+  var socket = io.connect();
+
+  /*
+  socket.on('welcome', function(data){
+    $("#textbox_cmdline_id").text(data);
+  });
+  */
+
 });
 
 function getServerOutput(cmd) {
   // Empty content string
   var textContent = '';
-  
+
   // jQuery AJAX call for textContent
   $.get( '/cmdline/'+cmd, function( data ) {
     textContent = data;
@@ -36,15 +44,15 @@ function getServerOutput(cmd) {
 }
 
 function cmdWithArgs(value){
-  
-  var input = value.toString(); 
-  var args_array = input.split(' '); 
- 
+
+  var input = value.toString();
+  var args_array = input.split(' ');
+
   $.ajax({
       type: 'GET',
       url:  '/cmdline/spawn',
       data: { "cmdline": input },
-      success: function(response){ 
+      success: function(response){
         $('#textArea').text(response);
         $('#textbox_cmdline_id').val("");
       },
